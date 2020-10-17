@@ -94,15 +94,26 @@ function checkInverseAlpha ()
     return (s2.data[0] === s1.data[0] && s2.data[1] === s1.data[1] && s2.data[2] === s1.data[2] && s2.data[3] === s1.data[3]);
 }
 
+function makeGetter (obj, key, getter)
+{
+    var value;
+    var property = function ()
+    {
+        if (value === undefined)
+        {
+            value = getter();
+        }
+        return value;
+    }
+    Object.defineProperty(obj, key, {get : property});
+}
+
 function init ()
 {
-    if (document !== undefined)
-    {
-        CanvasFeatures.supportNewBlendModes = checkBlendMode();
-        CanvasFeatures.supportInverseAlpha = checkInverseAlpha();
-    }
-
-    return CanvasFeatures;
+    var features = {};
+    makeGetter(features, 'supportNewBlendModes', checkBlendMode());
+    makeGetter(features, 'supportInverseAlpha', checkInverseAlpha());
+    return features;
 }
 
 module.exports = init();
